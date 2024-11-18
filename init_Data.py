@@ -44,6 +44,8 @@ for name_indx in column_types_object:
     label_encoder.fit(X.iloc[:, name_indx])
     X[X.columns[name_indx]] = label_encoder.transform(X.iloc[:, name_indx])
 
+X = X.values
+y = dataset.iloc[:, -1].values
 # Split DataSet after prepare data
 X_train, X_test, y_train, y_test = train_test_split(
                                                     X, y,
@@ -58,7 +60,7 @@ X_test = sc.transform(X_test)
 ###########################################
 ##########Function to run this file#########
 def run_init_Data(path:str, test_size:float=0.2, random_state:int=1):
-    path = path
+    dataset = pd.read_csv(path)
     test_size = test_size
     random_state = random_state
     
@@ -70,28 +72,33 @@ def run_init_Data(path:str, test_size:float=0.2, random_state:int=1):
                         'Fence', 'MiscFeature', 
                         ],axis=1)
 
-column_labels = {}
-column_types_numeric = []
-column_types_object = []
+    column_labels = {}
+    column_types_numeric = []
+    column_types_object = []
 
-for idx, column in enumerate(dataset.columns):
-    column_labels[column] = idx
-    if pd.api.types.is_numeric_dtype(dataset[column]):
-        column_types_numeric.append(column_labels[column])
-    else:
-        column_types_object.append(column_labels[column])
-        
-X = dataset.iloc[:, :-1]
-for name_indx in column_types_object:
-    label_encoder = LabelEncoder()
-    label_encoder.fit(X.iloc[:, name_indx])
-    X[X.columns[name_indx]] = label_encoder.transform(X.iloc[:, name_indx])
+    for idx, column in enumerate(dataset.columns):
+        column_labels[column] = idx
+        if pd.api.types.is_numeric_dtype(dataset[column]):
+            column_types_numeric.append(column_labels[column])
+        else:
+            column_types_object.append(column_labels[column])
+            
+    X = dataset.iloc[:, :-1]
+    for name_indx in column_types_object:
+        label_encoder = LabelEncoder()
+        label_encoder.fit(X.iloc[:, name_indx])
+        X[X.columns[name_indx]] = label_encoder.transform(X.iloc[:, name_indx])
 
-X_train, X_test, y_train, y_test = train_test_split(
-                                                    X, y,
-                                                    test_size = 0.2,
-                                                    random_state = 1
-                                                    )
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
+    X = X.values
+    y = dataset.iloc[:, -1].values
+    X_train, X_test, y_train, y_test = train_test_split(
+                                                        X, y,
+                                                        test_size = 0.2,
+                                                        random_state = 1
+                                                        )
+    sc = StandardScaler()
+    X_train = sc.fit_transform(X_train)
+    X_test = sc.transform(X_test)
+    
+    return X_train, y_train
+
