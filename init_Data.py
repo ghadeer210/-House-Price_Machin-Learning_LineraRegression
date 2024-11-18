@@ -113,5 +113,5 @@ def run_init_Data(path:str, test_size:float=0.2, random_state:int=1):
     X_train = sc.fit_transform(X_train)
     X_test = sc.transform(X_test)
     
-    return X_train, y_train
+    return X_train, X_test, y_train, y_test, X, y
 
